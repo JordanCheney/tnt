@@ -74,8 +74,5 @@ target_link_libraries(tnt ${BLAS_LIBRARIES})
 install(FILES ${TNT_HEADERS}
         DESTINATION include)
 
-# Optionally build the unit tests
-#add_subdirectory(test)
-
 # Optionally build the benchmarks
 add_subdirectory(benchmark)
