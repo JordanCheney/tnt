@@ -1,0 +1,258 @@
+language: cpp
+
+matrix:
+  include:
+    # GCC
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+            - cmake
+            - libopenblas-dev
+      env:
+         - CC=gcc-4.9
+         - CXX=g++-4.9
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - cmake
+            - libopenblas-dev
+      env:
+         - CC=gcc-5
+         - CXX=g++-5
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+            - cmake
+            - libopenblas-dev
+      env:
+        - CC=gcc-6
+        - CXX=g++-6
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - cmake
+            - libopenblas-dev
+      env:
+        - CC=gcc-7
+        - CXX=g++-7
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: osx
+      osx_image: xcode8.3
+      ruby: 2.3.3
+      env:
+        - CC=gcc-4.9
+        - CXX=g++-4.9
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: osx
+      osx_image: xcode8.3
+      ruby: 2.3.3
+      env:
+        - CC=gcc-5
+        - CXX=g++-5
+      install:
+         - rm /usr/local/include/c++
+         - brew install gcc5
+         - brew install openblas
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: osx
+      osx_image: xcode8.3
+      ruby: 2.3.3
+      env:
+        - CC=gcc-6
+        - CXX=g++-6
+      install:
+         - rm /usr/local/include/c++
+         - brew install gcc6
+         - brew install openblas
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: osx
+      osx_image: xcode8.3
+      ruby: 2.3.3
+      env:
+        - CC=gcc-7
+        - CXX=g++-7
+      install:
+         - rm /usr/local/include/c++
+         - brew install gcc
+         - brew install openblas
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    # Clang
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+            - cmake
+            - libopenblas-dev
+      env:
+        - CC=clang-3.6
+        - CXX=clang++-3.6
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+            - cmake
+            - libopenblas-dev
+      env:
+        - CC=clang-3.7
+        - CXX=clang++-3.7
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+          packages:
+            - clang-3.8
+            - cmake
+            - libopenblas-dev
+      env:
+        - CC=clang-3.8 
+        - CXX=clang++-3.8
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-3.9
+          packages:
+            - clang-3.9
+            - cmake
+            - libopenblas-dev
+      env:
+        - CC=clang-3.9
+        - CXX=clang++-3.9
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-4.0
+          packages:
+            - clang-4.0
+            - cmake
+            - libopenblas-dev
+      env:
+        - CC=clang-4.0
+        - CXX=clang++-4.0
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: linux
+      dist: trusty
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - cmake
+            - libopenblas-dev
+      env:
+        - CC=clang-5.0
+        - CXX=clang++-5.0
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
+
+    - os: osx
+      osx_image: xcode8.3
+      ruby: 2.3.3
+      env:
+        - CC=clang
+        - CXX=clang++
+      install:
+         - rm /usr/local/include/c++
+         - brew install openblas
+      script: 
+         - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+      after_success:
+         - ./build/tnt
