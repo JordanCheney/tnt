@@ -34,7 +34,6 @@ set(TNT_HEADERS include/tnt/tnt.hpp
                 include/tnt/utils/testing.hpp
                 include/tnt/utils/simd.hpp
 
-                include/tnt/deps/cblas.hpp
                 include/tnt/deps/doctest.hpp
 
                 include/tnt/math/math.hpp

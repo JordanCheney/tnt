@@ -7,7 +7,6 @@
 #include <benchmark/opencv_utils.hpp>
 
 #include <Eigen/Dense>
-#include <tnt/deps/cblas.hpp>
 
 template <typename DataType>
 static void multiply_TNT(benchmark::State& state, int size)
