@@ -32,33 +32,33 @@ struct OptimizedWinogradConvoluton
 } // namespace detail
 
 template <typename DataType>
-inline Tensor<DataType> conv_3d(const Tensor<DataType>& tensor,
-                                const Tensor<DataType>& kernel,
-                                int pad = 0,
-                                DataType pad_value = 0,
-                                int stride = 1)
+inline Tensor<DataType> conv3D(const Tensor<DataType>& tensor,
+                               const Tensor<DataType>& kernel,
+                               int pad = 0,
+                               DataType pad_value = 0,
+                               int stride = 1)
 {
     TNT_ASSERT(tensor.shape.num_axes() == 3,
-               InvalidParameterException("tnt::conv_3d()",
+               InvalidParameterException("tnt::conv3D()",
                                          __FILE__,
                                          __LINE__,
                                          "3D convolution requires a 3D tensor"))
 
     TNT_ASSERT(kernel.shape.num_axes() == 3,
-               InvalidParameterException("tnt::conv_3d()",
+               InvalidParameterException("tnt::conv3D()",
                                          __FILE__,
                                          __LINE__,
                                          "3D convolution requires a 3D kernel"))
 
     TNT_ASSERT(tensor.shape[2] == kernel.shape[2],
-               InvalidParameterException("tnt::conv_3d()",
+               InvalidParameterException("tnt::conv3D()",
                                          __FILE__,
                                          __LINE__,
                                          "3D convolution requires the tensor and kernel to have the same size least significant dimension"))
 
     TNT_ASSERT(tensor.shape[0] + pad >= kernel.shape[0]
                 && tensor.shape[1] + pad >= kernel.shape[1],
-               InvalidParameterException("tnt::conv_3d()",
+               InvalidParameterException("tnt::conv3D()",
                                          __FILE__,
                                          __LINE__,
                                          "3D convolution requires the tensor + padding to be larger than the kernel"))

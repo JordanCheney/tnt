@@ -3,7 +3,7 @@
 
 #include <tnt/utils/macros.hpp>
 
-#include <simdpp/simd.h>
+#include <tnt/deps/simd/simd.h>
 
 #include <sstream>
 
@@ -40,18 +40,58 @@ template <> struct OptimalSIMDSize<double>   { constexpr static int value = SIMD
 template <typename T, int Size>
 struct FullSIMDType {};
 
-template <int Size> struct FullSIMDType<uint8_t,  Size> { typedef simdpp::uint8<Size> VecType;  };
-template <int Size> struct FullSIMDType<uint16_t, Size> { typedef simdpp::uint16<Size> VecType; };
-template <int Size> struct FullSIMDType<uint32_t, Size> { typedef simdpp::uint32<Size> VecType; };
-template <int Size> struct FullSIMDType<uint64_t, Size> { typedef simdpp::uint64<Size> VecType; };
+template <int _Size> struct FullSIMDType<uint8_t, _Size>
+{
+    using VecType = simdpp::uint8<_Size>;
+    constexpr static int Size = _Size;
+};
+template <int _Size> struct FullSIMDType<uint16_t, _Size>
+{
+    using VecType = simdpp::uint16<_Size>;
+    constexpr static int Size = _Size;
+};
+template <int _Size> struct FullSIMDType<uint32_t, _Size>
+{
+    using VecType = simdpp::uint32<_Size>;
+    constexpr static int Size = _Size;
+};
+template <int _Size> struct FullSIMDType<uint64_t, _Size>
+{
+    using VecType = simdpp::uint64<_Size>;
+    constexpr static int Size = _Size;
+};
 
-template <int Size> struct FullSIMDType<int8_t,   Size> { typedef simdpp::int8<Size> VecType;  };
-template <int Size> struct FullSIMDType<int16_t,  Size> { typedef simdpp::int16<Size> VecType; };
-template <int Size> struct FullSIMDType<int32_t,  Size> { typedef simdpp::int32<Size> VecType; };
-template <int Size> struct FullSIMDType<int64_t,  Size> { typedef simdpp::int64<Size> VecType; };
+template <int _Size> struct FullSIMDType<int8_t, _Size>
+{
+    using VecType = simdpp::int8<_Size>;
+    constexpr static int Size = _Size;
+};
+template <int _Size> struct FullSIMDType<int16_t, _Size>
+{
+    using VecType = simdpp::int16<_Size>;
+    constexpr static int Size = _Size;
+};
+template <int _Size> struct FullSIMDType<int32_t, _Size>
+{
+    using VecType = simdpp::int32<_Size>;
+    constexpr static int Size = _Size;
+};
+template <int _Size> struct FullSIMDType<int64_t, _Size>
+{
+    using VecType = simdpp::int64<_Size>;
+    constexpr static int Size = _Size;
+};
 
-template <int Size> struct FullSIMDType<float,    Size> { typedef simdpp::float32<Size> VecType; };
-template <int Size> struct FullSIMDType<double,   Size> { typedef simdpp::float64<Size> VecType; };
+template <int _Size> struct FullSIMDType<float, _Size>
+{
+    using VecType = simdpp::float32<_Size>;
+    constexpr static int Size = _Size;
+};
+template <int _Size> struct FullSIMDType<double, _Size>
+{
+    using VecType = simdpp::float64<_Size>;
+    constexpr static int Size = _Size;
+};
 
 /// \brief Shortcut struct for a [FullSIMDType]() of a given type with the
 /// optimal size for that type on the current architecture
@@ -100,7 +140,7 @@ struct LoadSIMDType
     ///
     /// \requires `ptr` have at least N elements where N is the optimal SIMD
     /// size of type `T`
-    static TNT_INL typename SIMDType<T>::VecType load(U* ptr)
+    static TNT_INL typename SIMDType<T>::VecType load(const U* ptr)
     {
         typedef typename std::remove_cv<U>::type CleanU;
         typedef typename FullSIMDType<CleanU, OptimalSIMDSize<T>::value>::VecType OtherVecType;
@@ -114,7 +154,7 @@ struct LoadSIMDType
 template <>                                                                    \
 struct LoadSIMDType<LEFT_TYPE, RIGHT_TYPE>                                     \
 {                                                                              \
-    static TNT_INL typename SIMDType<LEFT_TYPE>::VecType load(RIGHT_TYPE* ptr) \
+    static TNT_INL typename SIMDType<LEFT_TYPE>::VecType load(const RIGHT_TYPE* ptr) \
     {                                                                          \
         LEFT_TYPE buffer[OptimalSIMDSize<LEFT_TYPE>::value];                   \
         for (int i = 0; i < OptimalSIMDSize<LEFT_TYPE>::value; ++i)            \
@@ -126,7 +166,7 @@ struct LoadSIMDType<LEFT_TYPE, RIGHT_TYPE>                                     \
 template <>                                                                    \
 struct LoadSIMDType<RIGHT_TYPE, LEFT_TYPE>                                     \
 {                                                                              \
-    static TNT_INL typename SIMDType<RIGHT_TYPE>::VecType load(LEFT_TYPE* ptr) \
+    static TNT_INL typename SIMDType<RIGHT_TYPE>::VecType load(const LEFT_TYPE* ptr) \
     {                                                                          \
         RIGHT_TYPE buffer[OptimalSIMDSize<RIGHT_TYPE>::value];                 \
         for (int i = 0; i < OptimalSIMDSize<RIGHT_TYPE>::value; ++i)           \
@@ -185,6 +225,61 @@ struct AlignSIMDType
     static TNT_INL int aligned_buffer_size(size_t bytes)
     {
         return num_aligned_blocks(bytes) << Shift;
+    }
+};
+
+/// \brief SIMDPP multiplication increases integer size to avoid overflow. This type
+///        is a convienience type to promote an integer input to its expected output
+template <typename T>
+struct IntegerMultiplicationResultType : public FullSIMDType<T, OptimalSIMDSize<T>::value>
+{
+    static_assert(sizeof(T) == -1, "IntegerMultiplicationResultType is valid only for [`uint8_t`, `uint16_t`, `uint32_t`, `int8_t`, `int16_t`, `int32_t`]");
+};
+
+template <> struct IntegerMultiplicationResultType<uint16_t> : public FullSIMDType<uint32_t, OptimalSIMDSize<uint16_t>::value> {};
+template <> struct IntegerMultiplicationResultType<uint32_t> : public FullSIMDType<uint64_t, OptimalSIMDSize<uint32_t>::value> {};
+
+template <> struct IntegerMultiplicationResultType<int16_t> : public FullSIMDType<int32_t, OptimalSIMDSize<int16_t>::value> {};
+template <> struct IntegerMultiplicationResultType<int32_t> : public FullSIMDType<int64_t, OptimalSIMDSize<int32_t>::value> {};
+
+/// \brief Provide a consistent interface for multiplication
+template <typename T>
+struct MultiplySIMD
+{
+    static_assert(std::is_arithmetic<T>::value,      "MultiplySIMD requires an arithmetic type");
+    static_assert(!std::is_same<T, uint8_t>::value,  "Unsigned 8 bit multiplication is not supported");
+    static_assert(!std::is_same<T, uint64_t>::value, "Unsigned 64 bit multiplication is not supported (overflow)");
+    static_assert(!std::is_same<T, int8_t>::value,   "Signed 8 bit multiplication is not supported");
+    static_assert(!std::is_same<T, int64_t>::value,  "Signed 64 bit multiplication is not supported (overflow)");
+
+    using VecType = typename SIMDType<T>::VecType;
+
+    static TNT_INL VecType run(const VecType& left, const VecType& right)
+    {
+        using IntegerResult = typename IntegerMultiplicationResultType<T>::VecType;
+
+        IntegerResult result = simdpp::mull(left, right);
+        return ConvertSIMDType<T>::convert(result);
+    }
+};
+
+template <> struct MultiplySIMD<float>
+{
+    using VecType = typename SIMDType<float>::VecType;
+
+    static TNT_INL VecType run(const VecType& left, const VecType& right)
+    {
+        return simdpp::mul(left, right);
+    }
+};
+
+template <> struct MultiplySIMD<double>
+{
+    using VecType = typename SIMDType<double>::VecType;
+
+    static TNT_INL VecType run(const VecType& left, const VecType& right)
+    {
+        return simdpp::mul(left, right);
     }
 };
 
