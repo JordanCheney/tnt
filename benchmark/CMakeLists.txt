@@ -18,9 +18,6 @@ if (BUILD_TNT_BENCHMARKS)
     mark_as_advanced(BENCHMARK_ENABLE_TESTING)
     mark_as_advanced(BENCHMARK_USE_LIBCXX)
 
-    # Include benchmark utilities
-    include_directories(include)
-
     # Link against OpenCV libraries
     find_package(OpenCV 3 REQUIRED)
 
@@ -39,6 +36,8 @@ if (BUILD_TNT_BENCHMARKS)
     # Build the benchmark executable
     add_executable(tnt_benchmarks run_benchmarks.cpp ${TNT_BENCHMARKS})
     target_link_libraries(tnt_benchmarks benchmark ${BLAS_LIBRARIES} opencv_core)
+    target_include_directories(tnt_benchmarks PRIVATE include ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/include/tnt/deps/simd)
+
     install(TARGETS tnt_benchmarks
             RUNTIME DESTINATION bin)
 endif()
