@@ -5,8 +5,6 @@
 #include <tnt/utils/testing.hpp>
 #include <tnt/utils/simd.hpp>
 
-#include <simdpp/simd.h>
-
 namespace tnt
 {
 

@@ -12,14 +12,13 @@ matrix:
           packages:
             - g++-4.9
             - cmake
-            - libopenblas-dev
       env:
          - CC=gcc-4.9
          - CXX=g++-4.9
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: linux
       dist: trusty
@@ -30,14 +29,13 @@ matrix:
           packages:
             - g++-5
             - cmake
-            - libopenblas-dev
       env:
          - CC=gcc-5
          - CXX=g++-5
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: linux
       dist: trusty
@@ -48,14 +46,13 @@ matrix:
           packages:
             - g++-6
             - cmake
-            - libopenblas-dev
       env:
         - CC=gcc-6
         - CXX=g++-6
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: linux
       dist: trusty
@@ -66,14 +63,13 @@ matrix:
           packages:
             - g++-7
             - cmake
-            - libopenblas-dev
       env:
         - CC=gcc-7
         - CXX=g++-7
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: osx
       osx_image: xcode8.3
@@ -84,7 +80,7 @@ matrix:
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: osx
       osx_image: xcode8.3
@@ -95,11 +91,10 @@ matrix:
       install:
          - rm /usr/local/include/c++
          - brew install gcc5
-         - brew install openblas
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: osx
       osx_image: xcode8.3
@@ -110,11 +105,10 @@ matrix:
       install:
          - rm /usr/local/include/c++
          - brew install gcc6
-         - brew install openblas
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: osx
       osx_image: xcode8.3
@@ -125,11 +119,10 @@ matrix:
       install:
          - rm /usr/local/include/c++
          - brew install gcc
-         - brew install openblas
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     # Clang
     - os: linux
@@ -142,14 +135,13 @@ matrix:
           packages:
             - clang-3.6
             - cmake
-            - libopenblas-dev
       env:
         - CC=clang-3.6
         - CXX=clang++-3.6
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: linux
       dist: trusty
@@ -161,14 +153,13 @@ matrix:
           packages:
             - clang-3.7
             - cmake
-            - libopenblas-dev
       env:
         - CC=clang-3.7
         - CXX=clang++-3.7
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: linux
       dist: trusty
@@ -180,14 +171,13 @@ matrix:
           packages:
             - clang-3.8
             - cmake
-            - libopenblas-dev
       env:
         - CC=clang-3.8 
         - CXX=clang++-3.8
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: linux
       dist: trusty
@@ -198,14 +188,13 @@ matrix:
           packages:
             - clang-3.9
             - cmake
-            - libopenblas-dev
       env:
         - CC=clang-3.9
         - CXX=clang++-3.9
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: linux
       dist: trusty
@@ -216,14 +205,13 @@ matrix:
           packages:
             - clang-4.0
             - cmake
-            - libopenblas-dev
       env:
         - CC=clang-4.0
         - CXX=clang++-4.0
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: linux
       dist: trusty
@@ -234,14 +222,13 @@ matrix:
           packages:
             - clang-5.0
             - cmake
-            - libopenblas-dev
       env:
         - CC=clang-5.0
         - CXX=clang++-5.0
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests
 
     - os: osx
       osx_image: xcode8.3
@@ -251,8 +238,7 @@ matrix:
         - CXX=clang++
       install:
          - rm /usr/local/include/c++
-         - brew install openblas
       script: 
          - cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
       after_success:
-         - ./build/tnt
+         - ./build/tnt_tests

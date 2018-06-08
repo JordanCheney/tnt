@@ -4,8 +4,6 @@
 #include <tnt/math/arithmetic_ops.hpp>
 #include <tnt/utils/testing.hpp>
 
-#include <simdpp/simd.h>
-
 namespace tnt
 {
 

@@ -18,11 +18,11 @@ if (BUILD_TNT_BENCHMARKS)
     mark_as_advanced(BENCHMARK_ENABLE_TESTING)
     mark_as_advanced(BENCHMARK_USE_LIBCXX)
 
-    # Include benchmark utilities
-    include_directories(include)
-
     # Link against OpenCV libraries
     find_package(OpenCV 3 REQUIRED)
+
+    # Link against BLAS
+    find_package(BLAS REQUIRED)
 
     # DocTest messes up the benchmark
     add_definitions(-DDOCTEST_CONFIG_DISABLE)
@@ -30,11 +30,14 @@ if (BUILD_TNT_BENCHMARKS)
     # Gather benchmarks
     set(TNT_BENCHMARKS src/math/add.cpp
                        src/math/multiply.cpp
-                       src/math/divide.cpp)
+                       src/math/divide.cpp
+                       src/linear/matrix_multiply.cpp)
 
     # Build the benchmark executable
     add_executable(tnt_benchmarks run_benchmarks.cpp ${TNT_BENCHMARKS})
     target_link_libraries(tnt_benchmarks benchmark ${BLAS_LIBRARIES} opencv_core)
+    target_include_directories(tnt_benchmarks PRIVATE include ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/include/tnt/deps/simd)
+
     install(TARGETS tnt_benchmarks
             RUNTIME DESTINATION bin)
 endif()
