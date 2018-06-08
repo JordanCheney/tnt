@@ -63,7 +63,7 @@ It uses CMake 3.X as its build system. To build and run the unit tests run-
 2. `mkdir build && cd build`
 3. `cmake ..`
 4. `make -j8`
-5. `./tnt`
+5. `./tnt_tests`
 
 To run the benchmarks do-
 
@@ -71,4 +71,4 @@ To run the benchmarks do-
 2. `mkdir build && cd build`
 3. `cmake -DBUILD_TNT_BENCHMARKS=ON ..`
 4. `make -j8`
-5. `./benchmark/tnt_benchmark`
+5. `./benchmark/tnt_benchmarks`
