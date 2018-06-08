@@ -7,6 +7,7 @@
 #include <benchmark/opencv_utils.hpp>
 
 #include <Eigen/Dense>
+#include <tnt/deps/cblas.hpp>
 
 template <typename DataType>
 static void multiply_TNT(benchmark::State& state, int size)
@@ -15,8 +16,8 @@ static void multiply_TNT(benchmark::State& state, int size)
         state.PauseTiming(); // We don't count tensor creation
         tnt::Shape shape{size, size};
 
-        tnt::Tensor<DataType, tnt::CPU> left(shape, 1.f);
-        tnt::Tensor<DataType, tnt::CPU> right(shape, 2.f);
+        tnt::Tensor<DataType> left(shape, 1.f);
+        tnt::Tensor<DataType> right(shape, 2.f);
 
         state.ResumeTiming();
         tnt::multiply(left, right);

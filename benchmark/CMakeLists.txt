@@ -24,13 +24,17 @@ if (BUILD_TNT_BENCHMARKS)
     # Link against OpenCV libraries
     find_package(OpenCV 3 REQUIRED)
 
+    # Link against BLAS
+    find_package(BLAS REQUIRED)
+
     # DocTest messes up the benchmark
     add_definitions(-DDOCTEST_CONFIG_DISABLE)
 
     # Gather benchmarks
     set(TNT_BENCHMARKS src/math/add.cpp
                        src/math/multiply.cpp
-                       src/math/divide.cpp)
+                       src/math/divide.cpp
+                       src/linear/matrix_multiply.cpp)
 
     # Build the benchmark executable
     add_executable(tnt_benchmarks run_benchmarks.cpp ${TNT_BENCHMARKS})

@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.0.0)
 
 include(cmake/version.cmake)
 include(cmake/flags.cmake)
-include(cmake/blas.cmake)
 include(cmake/coverage.cmake)
 include(cmake/docs.cmake)
 
@@ -64,11 +63,14 @@ set(TNT_HEADERS include/tnt/tnt.hpp
                 include/tnt/linear/impl/eigen_impl.hpp
                 include/tnt/linear/matrix_multiply.hpp
                 include/tnt/linear/impl/matrix_multiply_impl.hpp
+                include/tnt/linear/convolution.hpp
+                include/tnt/linear/impl/convolution_3d_impl.hpp
+                include/tnt/linear/discrete_cosine_transform.hpp
+                include/tnt/linear/impl/discrete_cosine_transform_impl.hpp
 )
 
 # Build the unit tests
 add_executable(tnt src/test.cpp ${TNT_HEADERS})
-target_link_libraries(tnt ${BLAS_LIBRARIES})
 
 # Install the headers
 install(FILES ${TNT_HEADERS}
