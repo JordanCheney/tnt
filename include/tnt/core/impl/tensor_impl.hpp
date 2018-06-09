@@ -26,11 +26,27 @@ namespace tnt
 template <typename DataType>
 inline Tensor<DataType>::Tensor() noexcept {}
 
+TEST_CASE_TEMPLATE("Tensor()", T, test_data_types)
+{
+    Tensor<T> t1;
+    REQUIRE(t1.data == AlignedPtr<T>());
+    REQUIRE(t1.shape == Shape());
+}
+
 template <typename DataType>
 inline Tensor<DataType>::Tensor(const Shape& shape)
 {
     this->shape  = shape;
     this->data   = AlignedPtr<DataType>(shape.total());
+}
+
+TEST_CASE_TEMPLATE("Tensor(Shape&)", T, test_data_types)
+{
+    Shape s1;
+    Tensor<T> t1(s1);
+
+    REQUIRE(t1.shape == s1);
+    REQUIRE(t1.data == AlignedPtr<T>(s1.total()));
 }
 
 // Shape + Data
@@ -39,6 +55,16 @@ inline Tensor<DataType>::Tensor(const Shape& shape, const PtrType& data)
 {
     this->shape  = shape;
     this->data   = data;
+}
+
+TEST_CASE_TEMPLATE("Tensor(Shape&, PtrType&)", T, test_data_types)
+{
+    Shape s1;
+    AlignedPtr<T> ptr1;
+    Tensor<T> t1(s1, ptr1);
+
+    REQUIRE(t1.shape == s1);
+    REQUIRE(t1.data == ptr1);
 }
 
 // Shape + Value
