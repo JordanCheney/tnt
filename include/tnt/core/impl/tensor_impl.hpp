@@ -42,11 +42,27 @@ inline Tensor<DataType>::Tensor(const Shape& shape)
 
 TEST_CASE_TEMPLATE("Tensor(Shape&)", T, test_data_types)
 {
+    /* generic Shape constructor test */
     Shape s1;
     Tensor<T> t1(s1);
 
     REQUIRE(t1.shape == s1);
-    REQUIRE(t1.data == AlignedPtr<T>(s1.total()));
+    REQUIRE(t1.data.size == s1.total());
+
+    /* Shape given initializer_list */
+    Shape s2{0, 1, 2};
+    Tensor<T> t2(s2);
+
+    REQUIRE(t2.shape == s2);
+    REQUIRE(t2.data.size == s2.total());
+
+    /* Shape given vector */
+    Shape s3(std::vector<int>{1, 2, 3, 4});
+    Tensor<T> t3(s3);
+
+    REQUIRE(t3.shape == s3);
+    REQUIRE(t3.data.size == s3.total());
+
 }
 
 // Shape + Data
@@ -59,12 +75,30 @@ inline Tensor<DataType>::Tensor(const Shape& shape, const PtrType& data)
 
 TEST_CASE_TEMPLATE("Tensor(Shape&, PtrType&)", T, test_data_types)
 {
+    /* Generic Shape, only testing Aligned_ptr
+     *
+     * Ptr with no parameters
+     */
+
     Shape s1;
     AlignedPtr<T> ptr1;
     Tensor<T> t1(s1, ptr1);
-
     REQUIRE(t1.shape == s1);
     REQUIRE(t1.data == ptr1);
+
+    /* ptr with size parameter only */
+    AlignedPtr<T> ptr2(10);
+    Tensor<T> t2(s1, ptr2);
+    REQUIRE(t2.data.size == 10);
+
+    /* ptr with size and value parameters */
+    T data[5] = {1, 2, 3, 4, 5};
+    AlignedPtr<T> ptr3(data, 5);
+    Tensor<T> t3(s1, ptr3);
+    REQUIRE(t3.data.size == 5);
+    REQUIRE(t3.data[2] == 3);
+    REQUIRE(t3.data[4] == 5);
+
 }
 
 // Shape + Value
@@ -77,11 +111,34 @@ inline Tensor<DataType>::Tensor(const Shape& shape, const DataType& value)
     this->operator=(value); // Set to value
 }
 
+TEST_CASE_TEMPLATE("Tensor(const Shape&, const DataType&)", T, test_data_types)
+{
+    Shape s1{2, 2};
+    Tensor<T> t1(s1, (T) 4);
+    AlignedPtr<T> test = t1.data;
+
+    for (int i = 0; i < 4; i++) {
+        REQUIRE(test[i] == 4);
+    }
+}
+
 template <typename DataType>
 inline Tensor<DataType>::Tensor(const SelfType& other)
 {
     this->shape  = other.shape;
     this->data   = other.data;
+}
+
+TEST_CASE_TEMPLATE("Tensor(const SelfType&)", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[4] = {1, 2, 3, 4};
+    AlignedPtr<T> ptr(data, 4);
+    const Tensor<T> t1(s1, ptr);
+    Tensor<T> t2(t1);
+
+    REQUIRE(t2.shape == t1.shape);
+    REQUIRE(t2.data == t1.data);
 }
 
 template <typename DataType>
@@ -93,6 +150,18 @@ inline Tensor<DataType>& Tensor<DataType>::operator=(const SelfType& other)
     return *this;
 }
 
+TEST_CASE_TEMPLATE("Tensor::operator=(const SelfType&)", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[4] = {1, 2, 3, 4};
+    AlignedPtr<T> ptr(data, 4);
+    Tensor<T> t1(s1, ptr);
+    Tensor<T> t2 = t1;
+
+    REQUIRE(t2.shape == t1.shape);
+    REQUIRE(t2.data == t1.data);
+}
+
 template <typename DataType>
 inline Tensor<DataType>::Tensor(SelfType&& other) noexcept
 {
@@ -102,6 +171,21 @@ inline Tensor<DataType>::Tensor(SelfType&& other) noexcept
     // Invalidate the moved object
     other.shape  = Shape();
     other.data   = PtrType();
+}
+
+TEST_CASE_TEMPLATE("Tensor(const SelfType&&)", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[4] = {1, 2, 3, 4};
+    AlignedPtr<T> ptr(data, 4);
+    Tensor<T> t1(s1, ptr);
+    Tensor<T> t2(std::move(t1));
+
+    REQUIRE(t2.shape == s1);
+    REQUIRE(t2.data == ptr);
+    REQUIRE(t1.shape == Shape());
+    REQUIRE(t1.data == AlignedPtr<T>());
+
 }
 
 template <typename DataType>
@@ -117,6 +201,20 @@ inline Tensor<DataType>& Tensor<DataType>::operator=(SelfType&& other) noexcept
     return *this;
 }
 
+TEST_CASE_TEMPLATE("Tensor::operator=(const SelfType&&)", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[4] = {1, 2, 3, 4};
+    AlignedPtr<T> ptr(data, 4);
+    Tensor<T> t1(s1, ptr);
+    Tensor<T> t2 = std::move(t1);
+
+    REQUIRE(t2.shape == s1);
+    REQUIRE(t2.data == ptr);
+    REQUIRE(t1.shape == Shape());
+    REQUIRE(t1.data == AlignedPtr<T>());
+}
+
 // ----------------------------------------------------------------------------
 // Iterators
 
@@ -126,10 +224,43 @@ inline typename Tensor<DataType>::IteratorType Tensor<DataType>::begin() const n
     return this->data.data;
 }
 
+TEST_CASE_TEMPLATE("Tensor::begin()", T, test_data_types)
+{
+    /* int */
+    Shape s1{2, 2};
+    T data[4] = {(T) 1, (T) 2, (T) 3, (T) 4};
+    AlignedPtr<T> ptr(data, 4);
+    Tensor<T> t1(s1, ptr);
+
+    REQUIRE(*t1.begin() == 1);
+
+    data[0] = (T) 5;
+    AlignedPtr<T> ptr1(data, 4);
+    Tensor<T> t2(s1, ptr1);
+    REQUIRE(*t2.begin() == 5);
+
+}
+
 template <typename DataType>
 inline typename Tensor<DataType>::IteratorType Tensor<DataType>::end() const noexcept
 {
     return this->data.is_null() ? nullptr : this->data.data + this->shape.total();
+}
+
+TEST_CASE_TEMPLATE("Tensor::end()", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[4] = {(T) 1, (T) 2, (T) 3, (T) 4};
+    AlignedPtr<T> ptr(data, 4);
+    Tensor<T> t1(s1, ptr);
+    T* it = t1.begin();
+
+    int cnt = 1;
+    while (*it != *t1.end()) {
+        REQUIRE(*it == (T) cnt);
+        it++;
+        cnt++;
+    }
 }
 
 template <typename DataType>
@@ -138,10 +269,43 @@ inline typename Tensor<DataType>::ConstIteratorType Tensor<DataType>::cbegin() c
     return this->data.data;
 }
 
+TEST_CASE_TEMPLATE("Tensor::cbegin()", T, test_data_types)
+{
+    /* int */
+    Shape s1{2, 2};
+    T data[4] = {(T) 1, (T) 2, (T) 3, (T) 4};
+    AlignedPtr<T> ptr(data, 4);
+    const Tensor<T> t1(s1, ptr);
+
+    REQUIRE(*t1.begin() == 1);
+
+    data[0] = (T) 5;
+    AlignedPtr<T> ptr1(data, 4);
+    const Tensor<T> t2(s1, ptr1);
+    REQUIRE(*t2.begin() == 5);
+
+}
+
 template <typename DataType>
 inline typename Tensor<DataType>::ConstIteratorType Tensor<DataType>::cend() const noexcept
 {
     return this->data.is_null() ? nullptr : this->data.data + this->shape.total();
+}
+
+TEST_CASE_TEMPLATE("Tensor::cend()", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[4] = {(T) 1, (T) 2, (T) 3, (T) 4};
+    AlignedPtr<T> ptr(data, 4);
+    const Tensor<T> t1(s1, ptr);
+    T* it = t1.begin();
+
+    int cnt = 1;
+    while (*it != *t1.end()) {
+                REQUIRE(*it == (T) cnt);
+        it++;
+        cnt++;
+    }
 }
 
 // ----------------------------------------------------------------------------
