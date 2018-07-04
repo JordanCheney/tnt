@@ -13,6 +13,35 @@ namespace tnt {
 
         struct OptimizedGaussianElimination<DataType> {
 
+            /* returns vector solution to G_E of tensor. Must be of same data type */
+            static Tensor<DataType> eval(Tensor<DataType> &tensor, Tensor<DataType> &vector) {
+
+                DataType *ptr = tensor.data.data;
+                DataType *vct = vector.data.data;
+                int num_rows = tensor.shape.axes[0];
+                int num_cols = tensor.shape.axes[1];
+
+                for (int i = 0; i < num_rows; i++) {
+                    int lead = num_cols * i;
+                    while (ptr[lead] == 0 && lead < (i*num_cols + num_rows)) {
+                        lead++;
+                    }
+
+                    if (ptr[lead] == 1) {
+                        clearColumn(ptr, i, (lead - (num_cols * i)), num_rows, num_cols, vct);
+                    } else if (lead != 0) {
+                        divideRow(ptr, ptr[lead], i, num_cols);
+                        divideVector(ptr, vector, i);
+                        clearColumn(ptr, i, (lead - (num_cols * i)), num_rows, num_cols, vct);
+                    }
+                }
+
+                naturalOrder(ptr, num_cols, num_rows, vct);
+                vector.data = AlignedPtr<DataType>(vct, vector.shape.total());
+
+                return vector;
+            }
+
             static Tensor<DataType> eval(Tensor<DataType> &tensor) {
 
                 DataType *ptr = tensor.data.data;
@@ -26,13 +55,13 @@ namespace tnt {
                     }
 
                     if (ptr[lead] == 1) {
-                        clearColumn(ptr, i, (lead - (num_cols * i)), num_rows, num_cols);
+                        clearColumn(ptr, i, (lead - (num_cols * i)), num_rows, num_cols, nullptr);
                     } else if (lead != 0) {
                         divideRow(ptr, ptr[lead], i, num_cols);
-                        clearColumn(ptr, i, (lead - (num_cols * i)), num_rows, num_cols);
+                        clearColumn(ptr, i, (lead - (num_cols * i)), num_rows, num_cols, nullptr);
                     }
                 }
-                naturalOrder(ptr, num_cols, num_rows);
+                naturalOrder(ptr, num_cols, num_rows, nullptr);
                 tensor.data = AlignedPtr<DataType>(ptr, tensor.shape.total());
 
                 return tensor;
@@ -40,7 +69,13 @@ namespace tnt {
 
         private:
 
-            static int findLead(DataType* data, int num_cols, int row, int num_rows) {
+            static void divideVector(DataType* vct, int row, DataType value)
+            {
+                vct[row] = vct[row] - value;
+            }
+
+            static int findLead(DataType* data, int num_cols, int row, int num_rows)
+            {
                 int lead_index = num_cols * row;
                 while (data[lead_index] == 0 && lead_index < (row * num_cols + num_rows)) {
                     lead_index++;
@@ -48,30 +83,27 @@ namespace tnt {
                 return lead_index - (row * num_cols);
             }
 
-            static void switchRows(DataType* data, int row1, int row2, int num_cols) {
-                std::cout << "switching rows " << row1 << " & " << row2 << std::endl;
+            static void switchRows(DataType* data, int row1, int row2, int num_cols, DataType* vct)
+            {
                 for (int i = 0; i < num_cols; i++) {
                     int temp = data[row1 * num_cols + i];
                     data[row1 * num_cols + i] = data[row2 * num_cols + i];
                     data[row2 * num_cols + i] = temp;
                 }
 
+                if (vct != nullptr) {
+                    int temp = vct[row1];
+                    vct[row1] = vct[row2];
+                    vct[row2] = temp;
+                }
             }
 
-            static void naturalOrder(DataType* data, int num_cols, int num_rows)
+            static void naturalOrder(DataType* data, int num_cols, int num_rows, DataType *vct)
             {
-                std::cout << "tensor is: " << std::endl;
-                for (int i = 0; i < num_rows; i++) {
-                    for (int j = 0; j < num_cols; j++) {
-                        std::cout << data[i*num_cols + j];
-                    }
-                    std::cout << "\n";
-                }
-
                 for (int i = 1; i < num_rows; i++) {
                     int j = i;
                     while (j >= 1 && (findLead(data, num_cols, j, num_rows) < findLead(data, num_cols, j - 1, num_rows))) {
-                        switchRows(data, j, j - 1, num_cols);
+                        switchRows(data, j, j - 1, num_cols, vct);
                         j = j - 1;
                     }
                 }
@@ -85,20 +117,21 @@ namespace tnt {
                 }
             }
 
-            static void subtractRow(DataType *data, int row, DataType val, int num_cols, int base)
+            static void subtractRow(DataType *data, int row, DataType val, int num_cols, int base, DataType *vct)
             {
                 for (int i = 0; i < num_cols; i++) {
                     data[(num_cols * row) + i] = data[(num_cols * row) + i] - (val * (data[(num_cols * base) + i]));
                 }
+                if (vct != nullptr) vct[row] = vct[row] - (val * (vct[base]));
             }
 
-            static void clearColumn(DataType *data, int row, int leading_index, int num_rows, int num_cols)
+            static void clearColumn(DataType *data, int row, int leading_index, int num_rows, int num_cols, DataType *vct)
             {
                 for (int i = 0; i < num_rows; i++) {
                     if (i != row) {
                         DataType match = data[(num_cols * i) + leading_index];
                         if (match != 0) {
-                            subtractRow(data, i, match, num_cols, row);
+                            subtractRow(data, i, match, num_cols, row, vct);
                         }
                     }
                 }
@@ -109,9 +142,9 @@ namespace tnt {
 
 } // namespace tnt
 
-using multiply_data_types = doctest::Types<float>;
+using elim_data_types = doctest::Types<float>;
 
-TEST_CASE_TEMPLATE("gaussian_elim(const Tensor<T>&)", T, multiply_data_types)
+TEST_CASE_TEMPLATE("gaussian_elim(const Tensor<T>&)", T, elim_data_types)
 {
     T data[9] = {(T) 1, (T) 0, (T) 0, (T) 0, (T) 1, (T) 0, (T) 0, (T) 0, (T) 1};
     tnt::AlignedPtr<T> ptr(data, 9);
@@ -172,5 +205,45 @@ TEST_CASE_TEMPLATE("gaussian_elim(const Tensor<T>&)", T, multiply_data_types)
 
 }
 
+TEST_CASE_TEMPLATE("gaussian_elim(const Tensor<T>&, const Tensor<T>&)", T, elim_data_types)
+{
+    T data[9] = {(T) 1, (T) 0, (T) 0, (T) 0, (T) 1, (T) 0, (T) 0, (T) 0, (T) 1};
+    tnt::AlignedPtr<T> ptr(data, 9);
+    tnt::Tensor<T> t1(tnt::Shape{3, 3}, ptr);
+
+    T sol[3] = {(T) 5, (T) 6, (T) 7};
+    tnt::AlignedPtr<T> vct(sol, 3);
+    tnt::Tensor<T> t2(tnt::Shape{3, 1}, vct);
+
+    tnt::Tensor<T> t3(tnt::Shape{3, 1}, vct);
+
+    REQUIRE(gaussian_elim(t1, t2) == t3);
+
+    T data1[9] = {(T) 1, (T) 0, (T) 0, (T) 1, (T) 1, (T) 0, (T) 0, (T) 0, (T) 1};
+    tnt::AlignedPtr<T> ptr1(data1, 9);
+    tnt::Tensor<T> t4(tnt::Shape{3, 3}, ptr1);
+    T sol1[3] = {(T) 5, (T) 1, (T) 7};
+    tnt::AlignedPtr<T> vct1(sol1, 3);
+    tnt::Tensor<T> t5(tnt::Shape{3, 1}, vct1);
+
+    REQUIRE(gaussian_elim(t4, t2) == t5);
+}
+
+TEST_CASE_TEMPLATE("gaussian_elim(const Tensor<T>&, const Tensor<T>&)", T, elim_data_types)
+{
+    T data[9] = {(T) 0, (T) 1, (T) 0, (T) 0, (T) 0, (T) 1, (T) 1, (T) 0, (T) 0};
+    tnt::AlignedPtr<T> ptr(data, 9);
+    tnt::Tensor<T> t1(tnt::Shape{3, 3}, ptr);
+
+    T sol[3] = {(T) 5, (T) 6, (T) 7};
+    tnt::AlignedPtr<T> vct(sol, 3);
+    tnt::Tensor<T> t2(tnt::Shape{3, 1}, vct);
+
+    T sol1[3] = {(T) 7, (T) 5, (T) 6};
+    tnt::AlignedPtr<T> vct1(sol1, 3);
+    tnt::Tensor<T> t3(tnt::Shape{3, 1}, vct1);
+
+    REQUIRE(gaussian_elim(t1, t2) == t3);
+}
 
 #endif // TNT_GAUSSIAN_ELIMINATION_IMPL_HPP

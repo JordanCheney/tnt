@@ -54,4 +54,5 @@ set(TNT_HEADERS include/tnt/tnt.hpp
                 include/tnt/linear/impl/convolution_3d_impl.hpp
                 include/tnt/linear/discrete_cosine_transform.hpp
                 include/tnt/linear/impl/discrete_cosine_transform_impl.hpp
-)
+    )
+

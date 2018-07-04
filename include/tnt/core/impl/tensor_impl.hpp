@@ -318,11 +318,34 @@ inline bool Tensor<DataType>::operator== (const SelfType& other) const noexcept
             && this->data == other.data;
 }
 
+TEST_CASE_TEMPLATE("Tensor::operator== (const SelfType&", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[3] = {1, 2, 3};
+    AlignedPtr<T> ptr(data, 3);
+    Tensor<T> t1(s1, ptr);
+    Tensor<T> t2(s1, ptr);
+    REQUIRE(t1 == t2);
+
+}
+
 template <typename DataType>
 inline bool Tensor<DataType>::operator!= (const SelfType& other) const noexcept
 {
     return this->shape != other.shape
             || this->data != other.data;
+}
+
+TEST_CASE_TEMPLATE("Tensor::operator== (const SelfType&", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[3] = {1, 2, 3};
+    T data1[3] = {3, 2, 1};
+    AlignedPtr<T> ptr(data, 3);
+    AlignedPtr<T> ptr1(data1, 3);
+    Tensor<T> t1(s1, ptr);
+    Tensor<T> t2(s1, ptr1);
+    REQUIRE(t1 != t2);
 }
 
 template <typename DataType>
@@ -335,6 +358,14 @@ inline Tensor<DataType>::operator DataType()
                                           "Attempted type promotion on an empty tensor."))
 
     return this->data[0];
+}
+
+TEST_CASE_TEMPLATE("Tensor::operator DataType()", T, test_data_types)
+{
+    Shape s1{2, 2};
+    T data[3] = {1, 2, 3};
+    AlignedPtr<T> ptr(data, 3);
+    Tensor<T> t1(s1, ptr);
 }
 
 template <typename DataType>
