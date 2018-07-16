@@ -24,9 +24,6 @@ if (BUILD_TNT_BENCHMARKS)
     # Link against BLAS
     find_package(BLAS REQUIRED)
 
-    # DocTest messes up the benchmark
-    add_definitions(-DDOCTEST_CONFIG_DISABLE)
-
     # Gather benchmarks
     set(TNT_BENCHMARKS src/math/add.cpp
                        src/math/multiply.cpp
@@ -35,6 +32,7 @@ if (BUILD_TNT_BENCHMARKS)
 
     # Build the benchmark executable
     add_executable(tnt_benchmarks run_benchmarks.cpp ${TNT_BENCHMARKS})
+    target_compile_options(tnt_benchmarks PRIVATE "-DDOCTEST_CONFIG_DISABLE" "-Wno-unused-parameter" "-Wno-unused-variable" "-Wno-unused-local-typedef")
     target_link_libraries(tnt_benchmarks benchmark ${BLAS_LIBRARIES} opencv_core)
     target_include_directories(tnt_benchmarks PRIVATE include ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/include/tnt/deps/simd)
 

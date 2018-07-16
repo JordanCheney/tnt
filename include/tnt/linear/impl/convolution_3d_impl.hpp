@@ -19,6 +19,8 @@ struct OptimizedConvolution3D<DataType, void>
 public:
     static Tensor<DataType> eval(const Tensor<DataType>& tensor, const Tensor<DataType>& kernel, int pad, int stride)
     {
+        /// Convolution 3D is done by tiling the column x channel operations and
+        /// dispatching them with as element wise multiplication
         int output_rows = (tensor.shape[0] - kernel.shape[0] + 2 * pad) / stride + 1;
         int output_cols = (tensor.shape[1] - kernel.shape[1] + 2 * pad) / stride + 1;
         Tensor<DataType> output(Shape{output_rows, output_cols});

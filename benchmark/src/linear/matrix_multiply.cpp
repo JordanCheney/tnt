@@ -132,7 +132,7 @@ class RegisterMatrixMultiplyBenchmark
 public:
     RegisterMatrixMultiplyBenchmark(const std::string& type)
     {
-        std::vector<int> sizes{4, 16, 64, 512, 2048};
+        std::vector<int> sizes{4, 16, 64, 512, 2048, 3121};
         for (int size : sizes) {
             std::string suffix = type + ">[" + std::to_string(size) + "x" + std::to_string(size) + "]";
             benchmark::RegisterBenchmark(("MatrixMultiply:TNT <" + suffix).c_str(), multiply_TNT<T>, size);

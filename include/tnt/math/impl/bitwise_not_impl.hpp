@@ -14,15 +14,31 @@ namespace detail
 template <typename LeftType>
 struct OptimizedBitwiseNot<LeftType>
 {
+    using VecType = typename SIMDType<LeftType>::VecType;
+
     static void eval(Tensor<LeftType>& tensor)
     {
+        constexpr int num_regs = 10;
+        VecType regs[num_regs];
+
         LeftType* ptr = tensor.data.data;
 
         int offset = 0, num_blocks = AlignSIMDType<LeftType>::num_aligned_blocks(tensor.shape.total());
-        for ( ; num_blocks--; offset += OptimalSIMDSize<LeftType>::value) {
-            auto block = LoadSIMDType<LeftType, LeftType>::load(ptr + offset);
-            auto result = simdpp::bit_not(block);
-            simdpp::store(ptr + offset, result);
+        for ( ; num_blocks; ) {
+            const int block_size = std::min(num_regs, num_blocks);
+
+            VecType* reg = regs;
+            for (int i = 0; i < block_size; ++i, ++reg) {
+                *reg = LoadSIMDType<LeftType, LeftType>::load(ptr + offset + i * OptimalSIMDSize<LeftType>::value);
+                *reg = simdpp::bit_not(*reg);
+            }
+
+            for (int i = 0; i < block_size; ++i) {
+                simdpp::store(ptr + offset + i * OptimalSIMDSize<LeftType>::value, regs[i]);
+            }
+
+            offset += block_size * OptimalSIMDSize<LeftType>::value;
+            num_blocks -= block_size;
         }
     }
 };

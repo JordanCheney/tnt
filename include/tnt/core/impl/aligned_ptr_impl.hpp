@@ -28,8 +28,11 @@ TNT_INL DataType* aligned_malloc(size_t size)
     size_t aligned_size = AlignSIMDType<DataType>::aligned_buffer_size(size) * sizeof(DataType);
 
     void* buffer;
-    if (posix_memalign(&buffer, 32, aligned_size))
+    if (posix_memalign(&buffer, 32, aligned_size)) {
         throw std::bad_alloc();
+    }
+
+    memset(buffer, 0, aligned_size);
 
     return static_cast<DataType*>(buffer);
 }

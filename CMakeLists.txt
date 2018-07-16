@@ -24,11 +24,11 @@ install(DIRECTORY include/tnt
 
 option(TNT_WITH_TEST_COVERAGE OFF)
 if (${TNT_WITH_TEST_COVERAGE})
-  target_compile_options(tnt_tests PRIVATE "-fprofile-arcs -ftest-coverage")
-#  file(GLOB_RECURSE TNT_CORE_HEADERS "include/tnt/core/*.hpp"
-#	                             "include/tnt/math/*.hpp"
-#				     "include/tnt/linear/*.hpp")
-#  tnt_add_coverage(${TNT_CORE_HEADERS} TRUE) 
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(tnt_tests PRIVATE "-fprofile-arcs -ftest-coverage")
+  else()
+    message(WARNING "Code coverage is currently only supported with GCC")
+  endif()
 endif()
 
 #option(TNT_WITH_SANITIZERS OFF)
