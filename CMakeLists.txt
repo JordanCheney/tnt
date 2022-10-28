@@ -11,11 +11,11 @@ include(cmake/3rdparty.cmake)
 # Add interface library for convenience
 add_library(tnt INTERFACE)
 target_include_directories(tnt INTERFACE include)
-target_link_libraries(tnt INTERFACE simdpp doctest)
+target_link_libraries(tnt INTERFACE simdpp)
 
 # Build the unit tests
 add_executable(tnt_tests src/test.cpp)
-target_link_libraries(tnt_tests LINK_PUBLIC tnt doctest)
+target_link_libraries(tnt_tests LINK_PUBLIC tnt)
 
 # Install the headers
 install(DIRECTORY include/tnt

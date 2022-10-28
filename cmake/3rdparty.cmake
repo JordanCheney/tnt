@@ -8,7 +8,3 @@ simdpp_get_runnable_archs(NATIVE_ARCHS)
 
 add_library(simdpp INTERFACE)
 target_include_directories(simdpp INTERFACE 3rdparty/libsimdpp)
-
-# ---- Doctest
-add_library(doctest INTERFACE)
-target_include_directories(doctest INTERFACE 3rdparty/doctest)
