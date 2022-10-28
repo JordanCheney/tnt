@@ -3,7 +3,7 @@
 
 #include <tnt/utils/macros.hpp>
 
-#include <tnt/deps/simd/simd.h>
+#include <simdpp/simd.h>
 
 #include <sstream>
 

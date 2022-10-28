@@ -1,7 +1,7 @@
 #ifndef TNT_TESTING_HPP
 #define TNT_TESTING_HPP
 
-#include <tnt/deps/doctest.hpp>
+#include <doctest/doctest.hpp>
 #include <tnt/core/tensor.hpp>
 
 #include <cstdint>
