@@ -2,10 +2,9 @@
 
 #include <tnt/core/core.hpp>
 #include <tnt/math/math.hpp>
+#include <tnt/benchmark/opencv_utils.hpp>
 
 #include <opencv2/core.hpp>
-#include <benchmark/opencv_utils.hpp>
-
 #include <Eigen/Dense>
 #include <blas/cblas.hpp>
 

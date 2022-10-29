@@ -4,6 +4,7 @@
 #include <tnt/core/export.hpp>
 
 #include <string>
+#include <cstring>
 #include <stdexcept>
 
 // ----------------------------------------------------------------------------

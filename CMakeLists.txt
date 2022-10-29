@@ -1,6 +1,15 @@
-project(tnt)
 cmake_minimum_required(VERSION 3.1.0)
-set(CMAKE_CXX_STANDARD 11)
+cmake_policy(SET CMP0048 NEW)
+
+project(tnt
+        VERSION 0.1.0
+        DESCRIPTION "A library for SIMD accelerated typed numerical tensors"
+        LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(TNT_THIRDPARTY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
 
 include(cmake/version.cmake)
 include(cmake/coverage.cmake)

@@ -1,3 +1,9 @@
 [submodule "3rdparty/libsimdpp"]
 	path = 3rdparty/libsimdpp
 	url = https://github.com/p12tic/libsimdpp.git
+[submodule "3rdparty/benchmark"]
+	path = 3rdparty/benchmark
+	url = https://github.com/google/benchmark.git
+[submodule "3rdparty/eigen"]
+	path = 3rdparty/eigen
+	url = https://gitlab.com/libeigen/eigen.git
